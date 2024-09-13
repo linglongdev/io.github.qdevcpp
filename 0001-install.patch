@@ -1,0 +1,81 @@
+From 6aa4f32860366a9b92b66fd7b8d37d28e0a8cfe8 Mon Sep 17 00:00:00 2001
+From: wjyrich <1071633242@qq.com>
+Date: Sun, 8 Sep 2024 13:10:52 +0800
+Subject: [PATCH] install
+
+---
+ CMakeLists.txt  | 39 +++++++++++++--------------------------
+ qdevcpp.desktop |  2 +-
+ 2 files changed, 14 insertions(+), 27 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 18c4452..48354c6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -74,36 +74,23 @@ set( RESOURCES
+ 
+ endif()
+ 
+-find_path( QSCINTILLA_INCLUDE_DIR
+-	NAMES Qsci qsciglobal.h
+-	PATHS ${Qt5Core_INCLUDE_DIRS}
+-	PATH_SUFFIXES Qsci
+-)
+-
+-find_library( QSCINTILLA_LIBRARY_RELWITHDEBINFO
+-	NAMES qscintilla2_qt5 qscintilla2
+-	PATHS ${CMAKE_LIBRARY_PATH_RELWITHDEBINFO}
+-)
+-
+-find_library( QSCINTILLA_LIBRARY_DEBUG
+-	NAMES qscintilla2_qt5 qscintilla2
+-	PATHS ${CMAKE_LIBRARY_PATH_DEBUG}
+-)
+-
+-if(QSCINTILLA_INCLUDE_DIR)
+-	add_library(QScintilla UNKNOWN IMPORTED)
+-	set_target_properties(QScintilla PROPERTIES
+-		IMPORTED_LOCATION_DEBUG ${QSCINTILLA_LIBRARY_DEBUG}
+-		IMPORTED_LOCATION_RELWITHDEBINFO ${QSCINTILLA_LIBRARY_RELWITHDEBINFO}
+-		INTERFACE_INCLUDE_DIRECTORIES ${QSCINTILLA_INCLUDE_DIR})
+-else()
+-	message(FATAL_ERROR "QScintilla Not Found")
+-endif()
+ 
++include_directories(${CMAKE_INSTALL_PREFIX}/include/x86_64-linux-gnu/qt5)
+ add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${RESOURCES} ${UIS})
+ 
+ if(MSVC)
+ 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:\"mainCRTStartup\"")
+ endif()
+ 
+-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Core Qt5::Gui Qt5::Widgets QScintilla)
++target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Core Qt5::Gui Qt5::Widgets ${CMAKE_INSTALL_PREFIX}/lib/libqscintilla2_qt5.so)
++link_directories(${CMAKE_INSTALL_PREFIX}/lib)
++
++install(TARGETS ${PROJECT_NAME}
++             DESTINATION bin)
++
++install(FILES qdevcpp.svg
++        DESTINATION share/icons)
++
++
++install(FILES qdevcpp.desktop
++            DESTINATION share/applications)
+\ No newline at end of file
+diff --git a/qdevcpp.desktop b/qdevcpp.desktop
+index eca2eff..2f7c8ea 100644
+--- a/qdevcpp.desktop
++++ b/qdevcpp.desktop
+@@ -1,7 +1,7 @@
+ [Desktop Entry]
+ Name=QDevCpp
+ Comment=Run QDevCpp
+-Exec=@ %F
++Exec=qdevcpp %F
+ Icon=qdevcpp
+ Terminal=false
+ Type=Application
+-- 
+2.43.4
+
